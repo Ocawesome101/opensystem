@@ -83,7 +83,7 @@ function fread(fpath, f)
   local data = ""
   repeat
     if f then f() end
-    local chunk = fs.read(handle, 128)
+    local chunk = fs.read(handle, 8)
     data = data .. (chunk or "")
   until not chunk
   fs.close(handle)
@@ -92,10 +92,10 @@ function fread(fpath, f)
 end
 
 function dofile(filepath)
-  local data = fread(filepath)
+  local data = fread(filepath, draw_loading)
 
   -- too much error handling? perhaps.
-  assert(
+  return assert(
     xpcall(
       assert(
         load(
@@ -115,4 +115,4 @@ end
 run("/uilib.lua")
 run("/login.lua")
 
-while true do computer.pullSignal(0.1) draw_loading() end
+while true do ui.tick() end
