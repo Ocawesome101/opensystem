@@ -61,10 +61,12 @@ end
 draw_logo(64, 12)
 
 function syserror(e)
-  gpu.setBackground(0x000040)
-  gpu.setForeground(0xCCFFFF)
-  gpu.fill(1, 1, 160, 50, " ")
-  gpu.set(44, 17, "A fatal system error has occurred.")
+  gpu.setBackground(0x808080)
+  gpu.fill(40, 15, 80, 20, " ")
+  gpu.setBackground(0xc0c0c0)
+  gpu.fill(42, 16, 76, 18, " ")
+  gpu.setForeground(0x000000)
+  gpu.set(44, 17, "A fatal system error has occurred:")
   local l = 0
   for line in debug.traceback(e, 2):gmatch("[^\n]+") do
     gpu.set(44, 19 + l, (line:gsub("\t", "  ")))
@@ -91,11 +93,11 @@ function fread(fpath, f)
   return data
 end
 
-function dofile(filepath)
-  local data = fread(filepath, draw_loading)
+local function dfile(filepath, x)
+  local data = fread(filepath, x and draw_loading or nil)
 
   -- too much error handling? perhaps.
-  return assert(
+  return select(2, assert(
     xpcall(
       assert(
         load(
@@ -104,15 +106,16 @@ function dofile(filepath)
       ),
       debug.traceback
     )
-  )
+  ))
 end
 
-local function run(f)
-  local ok, err = pcall(dofile, f)
+function dofile(f, x)
+  local ok, err = pcall(dfile, f, x)
   if not ok then syserror(err) end
+  return err
 end
 
-run("/uilib.lua")
-run("/login.lua")
+dofile("/uilib.lua", true)
+dofile("/login.lua", true)
 
 while true do ui.tick() end
