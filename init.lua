@@ -116,6 +116,7 @@ function dofile(f, x)
 end
 
 dofile("/uilib.lua", true)
+dofile("/window.lua", true)
 dofile("/login.lua", true)
 
 while true do ui.tick() end
