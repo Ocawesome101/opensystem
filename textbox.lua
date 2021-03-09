@@ -1,0 +1,52 @@
+-- textboxes
+
+local base = {}
+
+function base:key(k)
+  if self.focused == 0 then return end
+  local box = self.boxes[self.focused]
+  if not box then return end
+  if k == 8 then
+    box.text = box.text:sub(1, -2)
+  elseif k == 13 and box.submit then
+    if select(2, pcall(box.submit, box.text)) == true then
+      box.text = ""
+    end
+  elseif k >= 31 and k <= 127 then
+    box.text = box.text .. string.char(k)
+  end
+end
+
+function base:click(x, y)
+  self.focused = 0
+  for k, v in pairs(self.boxes) do
+    if x >= v.x and x <= v.x + v.w and y == v.y then
+      self.focused = k
+    end
+  end
+end
+
+function base:draw(app)
+  local f, b
+  for k, v in pairs(self.boxes) do
+    if v.bg and v.bg ~= b then
+      gpu.setBackground(v.bg)
+      b = v.bg
+    elseif v.fg and v.fg ~= f then
+      gpu.setForeground(v.fg)
+      f = v.fg
+    end
+    gpu.fill(app.x+v.x-1,app.y+v.y-1,v.w,1," ")
+    gpu.set(app.x+v.x-1,app.y+v.y-1,(v.text:sub(0-v.w-1)..(
+      self.focused == k and "|" or " ")))
+  end
+end
+
+function base:add(new)
+  new.text = new.text or ""
+  self.boxes[#self.boxes+1] = new
+end
+
+function textboxgroup()
+  return setmetatable({focused=0,boxes={}},{__index=base})
+end

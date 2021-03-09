@@ -35,7 +35,7 @@ function ui.tick()
     windows[1].drag = true
   elseif s[1] == "drop" and search(s[3],s[4])==1 then
     if s[5] == 1 then
-      windows[1]:close()
+      if windows[1].close then windows[1]:close() end
       table.remove(windows, 1)
     elseif not windows[1].drag then
       windows[1]:click(s[3]-windows[1].x+1, s[4]-windows[1].y+1)

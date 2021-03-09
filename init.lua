@@ -4,6 +4,7 @@ local fs = component.proxy(computer.getBootAddress())
 local gpu = component.proxy((component.list("gpu", true)()))
 gpu.bind((component.list("screen", true)()))
 
+_G.fs = fs
 _G.gpu = gpu
 
 local logo = {
@@ -117,6 +118,8 @@ end
 
 dofile("/ui.lua", true)
 dofile("/buttons.lua", true)
+dofile("/textbox.lua", true)
+dofile("/label.lua", true)
 dofile("/window.lua", true)
 dofile("/login.lua", true)
 

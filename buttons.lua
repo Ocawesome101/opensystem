@@ -2,7 +2,7 @@
 
 local base = {}
 
-function base:check(x, y)
+function base:click(x, y)
   for k,v in pairs(self.buttons) do
     if x >= v.x and x <= v.x + #v.text and y == v.y then
       v.click()
