@@ -7,21 +7,26 @@ function app:init()
   self.y = 1
   self.w = 20
   self.h = 10
+  self.buttons = buttongroup()
+  self.buttons:add({
+    x = 3, y = 4, text = "Shut Down",
+    click = function()computer.shutdown()end
+  })
+  self.buttons:add({
+    x = 3, y = 5, text = "Restart",
+    click = function()computer.shutdown(true)end
+  })
 end
 
 function app:refresh()
   gpu.setForeground(0x000000)
-  gpu.set(self.x + 2, self.y + 1, string.format("Free: %sk", computer.freeMemory() // 1024))
-  gpu.set(self.x + 2, self.y + 3, "Shut Down")
-  gpu.set(self.x + 3, self.y + 4, "Restart")
+  gpu.set(self.x + 2, self.y + 1, string.format("Total: %sk", computer.totalMemory() // 1024))
+  gpu.set(self.x + 2, self.y + 2, string.format("Free: %sk", computer.freeMemory() // 1024))
+  self.buttons:draw(self)
 end
 
 function app:click(x, y)
-  if x >= 3 and x <= 11 and y == 4 then
-    computer.shutdown()
-  elseif x >= 4 and x <= 10 and y == 5 then
-    computer.shutdown(true)
-  end
+  self.buttons:check(x, y)
 end
 
 function app:key()

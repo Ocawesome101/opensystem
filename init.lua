@@ -115,7 +115,8 @@ function dofile(f, x)
   return err
 end
 
-dofile("/uilib.lua", true)
+dofile("/ui.lua", true)
+dofile("/buttons.lua", true)
 dofile("/window.lua", true)
 dofile("/login.lua", true)
 
