@@ -85,7 +85,7 @@ function fread(fpath, f)
   local data = ""
   repeat
     if f then f() end
-    local chunk = fs.read(handle, 8)
+    local chunk = fs.read(handle, math.huge)
     data = data .. (chunk or "")
   until not chunk
   fs.close(handle)
