@@ -14,13 +14,14 @@ local function prompt(f)
     self.labels = labelgroup()
     self.buttons = buttongroup()
     self.labels:add {
-      x = 3, y = 2, text = "What do you want to"
+      x = 3, y = 2, fg = 0x000000, text = "What do you want to"
     }
     self.labels:add {
-      x = 3, y = 3, text = "do with this file?"
+      x = 3, y = 3, fg = 0x000000, text = "do with this file?"
     }
     self.buttons:add {
-      x = 3, y = 5, text = "Execute", click = function()
+      x = 3, y = 5, bg = 0x000000, fg = 0x888888, text = "Execute",
+      click = function()
         local app = dofile(f)
         if app then ui.add(app) end
         self.closeme = true
@@ -51,11 +52,11 @@ local function mkfolderview(f)
   local files = fs.list(f) or {}
   for i, file in ipairs(files) do
     buttons:add {
-      x = 2, y = i + 3,
+      x = 3, y = i + 3,
       text = file,
       click = function()
         if fs.isDirectory(f .. "/" .. file) then
-          app.buttons = mkfolderview(f .. "/" .. file)
+          app.files = mkfolderview(f .. "/" .. file)
           app.textboxes.boxes[1].text = (f .. "/" .. file):gsub("[/\\]+", "/")
         else
           prompt(f.."/"..file)
@@ -63,6 +64,7 @@ local function mkfolderview(f)
       end
     }
   end
+  app.h = #files + 4
   return buttons
 end
 
@@ -77,21 +79,31 @@ function app:init()
   }
   self.textboxes = textboxgroup()
   self.textboxes:add {
-    x = 8, y = 2, w = 54, fg = 0x888888, bg = 0x000000,
+    x = 8, y = 2, w = 52, fg = 0x888888, bg = 0x000000,
     text = "/", submit = function(text)
       if fs.exists(text) then
-        self.view = mkfolderview(text)
-      else
-        self.view = {}
+        self.files = mkfolderview(text)
       end
     end
   }
-  self.buttons = mkfolderview("/")
+  self.files = mkfolderview("/")
+  self.navigation = buttongroup()
+  self.navigation:add {
+    x = 62, y = 2, fg = 0x888888, bg = 0x000000,
+    text = "^", click = function()
+      local fp = self.textboxes.boxes[1].text
+      fp = fp:gsub("^/.+/(.+/?)$", "")
+      if fp == "" then fp = "/" end
+      self.files = mkfolderview(fp)
+      self.textboxes.boxes[1].text = fp
+    end
+  }
 end
 
 function app:refresh()
   self.labels:draw(self)
-  self.buttons:draw(self)
+  self.files:draw(self)
+  self.navigation:draw(self)
   self.textboxes:draw(self)
 end
 
@@ -100,8 +112,9 @@ function app:key(k)
 end
 
 function app:click(x, y)
-  self.buttons:click(x, y)
+  self.navigation:click(x, y)
   self.textboxes:click(x, y)
+  self.files:click(x, y)
 end
 
 return window(app, "File Browser")

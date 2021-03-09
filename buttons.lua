@@ -17,7 +17,7 @@ function base:draw(app)
       gpu.setForeground(v.fg)
       f = v.fg
     end
-    if v.bg and b.bg ~= b then
+    if v.bg and v.bg ~= b then
       gpu.setBackground(v.bg)
       b = v.bg
     end

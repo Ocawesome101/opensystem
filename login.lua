@@ -47,10 +47,8 @@ function app:click(x, y)
   end
   if x >= 14 and x <= 18 and y == 9 then
     -- TODO: proper login scheme
-    self.close = function() end
-    computer.pushSignal("touch", nil, self.x + 3, self.y + 3)
-    computer.pushSignal("drop", nil, self.x + 3, self.y + 3, 1)
-    local new = dofile("/monitor.lua")
+    self.closeme = true
+    local new = dofile("/apps/monitor.lua")
     ui.add(new)
   end
 end

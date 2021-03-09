@@ -12,6 +12,8 @@ local function wrap(app, name)
   end
   
   function w:refresh(gpu)
+    self.w = app.w + 4
+    self.h = app.h + 2
     gpu.setBackground(0x444444)
     gpu.setForeground(0x888888)
     gpu.fill(self.x, self.y, self.w, self.h, " ")

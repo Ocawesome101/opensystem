@@ -9,7 +9,7 @@ function base:key(k)
   if k == 8 then
     box.text = box.text:sub(1, -2)
   elseif k == 13 and box.submit then
-    if select(2, pcall(box.submit, box.text)) == true then
+    if box.submit(box.text) == true then
       box.text = ""
     end
   elseif k >= 31 and k <= 127 then
@@ -32,7 +32,7 @@ function base:draw(app)
     if v.bg then gpu.setBackground(v.bg) end
     if v.fg then gpu.setForeground(v.fg) end
     gpu.fill(app.x+v.x-1,app.y+v.y-1,v.w,1," ")
-    gpu.set(app.x+v.x-1,app.y+v.y-1,(v.text:sub(0-v.w-1)..(
+    gpu.set(app.x+v.x-1,app.y+v.y-1,(v.text:sub(0-v.w+1)..(
       self.focused == k and "|" or " ")))
   end
 end

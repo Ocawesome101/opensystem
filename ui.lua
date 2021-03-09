@@ -41,7 +41,7 @@ function ui.tick()
     elseif windows[1].drag ~= 1 then
       windows[1]:click(s[3]-windows[1].x+1, s[4]-windows[1].y+1)
     end
-    windows[1].drag = false
+    if windows[1] then windows[1].drag = false end
   elseif s[1] == "key_up" then
     windows[1]:key(s[3], s[4])
   end
