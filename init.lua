@@ -116,11 +116,11 @@ function dofile(f, x)
   return err
 end
 
-dofile("/ui.lua", true)
-dofile("/buttons.lua", true)
-dofile("/textbox.lua", true)
-dofile("/label.lua", true)
-dofile("/window.lua", true)
-dofile("/login.lua", true)
+dofile("/lib/ui.lua", true)
+dofile("/lib/buttons.lua", true)
+dofile("/lib/textbox.lua", true)
+dofile("/lib/label.lua", true)
+dofile("/lib/window.lua", true)
+dofile("/apps/login.lua", true)
 
 while true do ui.tick() end

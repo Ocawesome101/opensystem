@@ -48,8 +48,10 @@ function app:click(x, y)
   if x >= 14 and x <= 18 and y == 9 then
     -- TODO: proper login scheme
     self.closeme = true
-    local new = dofile("/apps/monitor.lua")
-    ui.add(new)
+    local mon = dofile("/apps/monitor.lua")
+    local fbr = dofile("/apps/browser.lua")
+    ui.add(mon)
+    ui.add(fbr)
   end
 end
 
