@@ -29,13 +29,8 @@ end
 function base:draw(app)
   local f, b
   for k, v in pairs(self.boxes) do
-    if v.bg and v.bg ~= b then
-      gpu.setBackground(v.bg)
-      b = v.bg
-    elseif v.fg and v.fg ~= f then
-      gpu.setForeground(v.fg)
-      f = v.fg
-    end
+    if v.bg then gpu.setBackground(v.bg) end
+    if v.fg then gpu.setForeground(v.fg) end
     gpu.fill(app.x+v.x-1,app.y+v.y-1,v.w,1," ")
     gpu.set(app.x+v.x-1,app.y+v.y-1,(v.text:sub(0-v.w-1)..(
       self.focused == k and "|" or " ")))

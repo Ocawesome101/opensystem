@@ -27,10 +27,16 @@ function app:init()
   })
 end
 
+local last = computer.uptime()
+local free = computer.freeMemory() // 1024
 function app:refresh()
   gpu.setForeground(0x000000)
   gpu.set(self.x + 2, self.y + 1, string.format("Total: %sk", computer.totalMemory() // 1024))
-  gpu.set(self.x + 2, self.y + 2, string.format("Free: %sk", computer.freeMemory() // 1024))
+  if computer.uptime() - last >= 1 then
+    free = computer.freeMemory() // 1024
+    last = computer.uptime()
+  end
+  gpu.set(self.x + 2, self.y + 2, string.format("Free: %sk", free))
   gpu.set(self.x + 2, self.y + 5, "Run File")
   self.buttons:draw(self)
   self.textbox:draw(self)
