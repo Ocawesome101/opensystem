@@ -80,9 +80,10 @@ end
 
 function fread(fpath, f)
   if not fs.exists(fpath) then
-    error(fpath..": no such file or directory")
+    return nil, fpath..": no such file or directory"
   end
-  local handle = assert(fs.open(fpath, "r"))
+  local handle, err = fs.open(fpath, "r")
+  if not handle then return nil, err end
   local data = ""
   repeat
     if f then f() end
@@ -95,7 +96,8 @@ function fread(fpath, f)
 end
 
 local function dfile(filepath, x)
-  local data = fread(filepath, x and draw_loading or nil)
+  local data = assert(
+    fread(filepath, x and draw_loading or nil))
 
   -- too much error handling? perhaps.
   return select(2, assert(

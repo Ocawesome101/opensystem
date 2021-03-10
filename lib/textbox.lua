@@ -32,8 +32,9 @@ function base:draw(app)
     if v.bg then gpu.setBackground(v.bg) end
     if v.fg then gpu.setForeground(v.fg) end
     gpu.fill(app.x+v.x-1,app.y+v.y-1,v.w,1," ")
-    gpu.set(app.x+v.x-1,app.y+v.y-1,(v.text:sub(0-v.w+1)..(
-      self.focused == k and "|" or " ")))
+    local wr = (self.focused == k and (v.text:sub(0-v.w+1).."|") or
+      (v.text:sub(1,v.w)))
+    gpu.set(app.x+v.x-1,app.y+v.y-1,wr)
   end
 end
 
