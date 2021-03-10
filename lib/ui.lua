@@ -36,7 +36,10 @@ function ui.tick()
     windows[1].drag = 1
   elseif s[1] == "drop" and search(s[3],s[4])==1 then
     if s[5] == 1 then
-      if windows[1].close then windows[1]:close() end
+      if windows[1].close then
+        local r = windows[1]:close()
+        if r == "__no_keep_me_open" then goto draw end
+      end
       table.remove(windows, 1)
     elseif windows[1].drag ~= 1 then
       windows[1]:click(s[3]-windows[1].x+1, s[4]-windows[1].y+1)

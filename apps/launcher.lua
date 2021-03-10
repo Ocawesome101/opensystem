@@ -56,6 +56,7 @@ function app:key(k)
 end
 
 function app:close()
+  return "__no_keep_me_open"
 end
 
 return window(app, "Launcher")
