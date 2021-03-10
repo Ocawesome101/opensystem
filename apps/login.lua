@@ -49,9 +49,9 @@ function app:click(x, y)
     -- TODO: proper login scheme
     self.closeme = true
     local mon = dofile("/apps/monitor.lua")
-    local fbr = dofile("/apps/browser.lua")
+    local lcr = dofile("/apps/launcher.lua")
     ui.add(mon)
-    ui.add(fbr)
+    ui.add(lcr)
   end
 end
 

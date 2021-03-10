@@ -56,8 +56,9 @@ local function mkfolderview(f)
       text = file,
       click = function()
         if fs.isDirectory(f .. "/" .. file) then
-          app.files = mkfolderview(f .. "/" .. file)
-          app.textboxes.boxes[1].text = (f .. "/" .. file):gsub("[/\\]+", "/")
+          _G.CD = (f.."/"..file):gsub("[/\\]+", "/")
+          ui.add(dofile("/apps/browser.lua"))
+          _G.CD = nil
         else
           prompt(f.."/"..file)
         end
@@ -80,18 +81,20 @@ function app:init()
   self.textboxes = textboxgroup()
   self.textboxes:add {
     x = 8, y = 2, w = 52, fg = 0x888888, bg = 0x000000,
-    text = "/", submit = function(text)
+    text = CD or "/", submit = function(text)
       if fs.exists(text) then
         self.files = mkfolderview(text)
       end
     end
   }
-  self.files = mkfolderview("/")
+  self.files = mkfolderview(CD or "/")
   self.navigation = buttongroup()
   self.navigation:add {
     x = 62, y = 2, fg = 0x888888, bg = 0x000000,
     text = "^", click = function()
       local fp = self.textboxes.boxes[1].text
+      if fp == "/" then return end
+      self.closeme = true
       fp = fp:gsub("^/.+/(.+/?)$", "")
       if fp == "" then fp = "/" end
       self.files = mkfolderview(fp)
