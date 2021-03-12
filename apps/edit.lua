@@ -7,10 +7,14 @@ local scr = 0
 
 local function update()
   app.textboxes = textboxgroup()
-  for i=scr+1, math.min(app.h,#lines), 1 do
+  for i=scr+1, math.min(app.h,math.max(#lines,1)), 1 do
     app.textboxes:add {
-      x = 1, y = i, w = app.w - 1, submit = function()
-        table.insert(lines, i + 1, "")
+      x = 1, y = i, w = app.w - 1, fg = 0x000000, submit = function()
+        if i >= #lines then
+          lines[#lines+1]=""
+        else
+          table.insert(lines, i + 1, "")
+        end
       end
     }
   end
@@ -32,6 +36,8 @@ end
 
 function app:refresh()
   self.textboxes:draw(self)
+  gpu.set(self.x + self.w - 1, self.y + self.h - 2, "^")
+  gpu.set(self.x + self.w - 1, self.y + self.h - 1, "v")
 end
 
 function app:key(k, c)
