@@ -26,6 +26,15 @@ local function search(x, y)
   end
 end
 
+-- return whether w1 overlaps with w2
+local function overlaps(w1, w2)
+  local blx, bly = w1.x + w1.w, w2.y + w1.h
+  return (w1.x >= w2.x and w1.x <= w2.x + w2.w and w1.y >= w2.y
+    and w1.y <= w2.y + w2.h) or
+         (w2.x >= blx and w2.x + w2.h <= blx and w2.y >= bly
+    and w2.y + w2.h <= bly)
+end
+
 local dx, dy, to = 0, 0, 1
 function ui.tick()
   local s = table.pack(computer.pullSignal(to))
@@ -71,7 +80,7 @@ function ui.tick()
       gpu.fill(windows[i].x, windows[i].y, windows[i].w, windows[i].h, " ")
       table.remove(windows, i)
       to = 0
-    else
+    elseif s[1] then
       if ui.buffered then
         gpu.setActiveBuffer(windows[i].buf)
       end
@@ -82,6 +91,21 @@ function ui.tick()
       if ui.buffered then
         gpu.bitblt(0, windows[i].x, windows[i].y)
         gpu.setActiveBuffer(0)
+      end
+    elseif windows[i].drag then
+      for n=1, i, 1 do
+        if overlaps(windows[n], windows[i]) then
+          if ui.buffered then
+            gpu.setActiveBuffer(windows[i].buf)
+          end
+          if not (windows[1].drag and ui.buffered) then
+            windows[i]:refresh(gpu)
+          end
+          if ui.buffered then
+            gpu.bitblt(0, windows[i].x, windows[i].y)
+            gpu.setActiveBuffer(0)
+          end
+        end
       end
     end
   end

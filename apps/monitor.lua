@@ -7,6 +7,7 @@ function app:init()
   self.y = 1
   self.w = 20
   self.h = 10
+  self.active = true
   self.buttons = buttongroup()
   self.textbox = textboxgroup()
   self.buttons:add({
