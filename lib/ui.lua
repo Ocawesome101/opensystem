@@ -28,6 +28,7 @@ end
 
 -- return whether w1 overlaps with w2
 local function overlaps(w1, w2)
+  do return true end
   local blx, bly = w1.x + w1.w, w2.y + w1.h
   return (w1.x >= w2.x and w1.x <= w2.x + w2.w and w1.y >= w2.y
     and w1.y <= w2.y + w2.h) or
@@ -96,16 +97,22 @@ function ui.tick()
       for n=1, i, 1 do
         if overlaps(windows[n], windows[i]) then
           if ui.buffered then
-            gpu.setActiveBuffer(windows[i].buf)
+            gpu.setActiveBuffer(windows[n].buf)
           end
-          if not (windows[1].drag and ui.buffered) then
-            windows[i]:refresh(gpu)
-          end
+          windows[n]:refresh(gpu)
           if ui.buffered then
-            gpu.bitblt(0, windows[i].x, windows[i].y)
+            gpu.bitblt(0, windows[n].x, windows[n].y)
             gpu.setActiveBuffer(0)
           end
         end
+      end
+      if ui.buffered then
+        gpu.setActiveBuffer(windows[i].buf)
+      end
+      windows[i]:refresh(gpu)
+      if ui.buffered then
+        gpu.bitblt(0, windows[i].x, windows[i].y)
+        gpu.setActiveBuffer(0)
       end
     end
   end
