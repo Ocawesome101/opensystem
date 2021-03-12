@@ -12,16 +12,18 @@ local function wrap(app, name)
   end
   
   function w:refresh(gpu)
-    self.w = app.w + 4
-    self.h = app.h + 2
+    local x, y = self.x, self.y
+    if ui.buffered then
+      x, y = 1, 1
+    end
     gpu.setBackground(0x444444)
     gpu.setForeground(0x888888)
-    gpu.fill(self.x, self.y, self.w, self.h, " ")
-    if name then gpu.set(self.x, self.y, name) end
+    gpu.fill(x, y, self.w, self.h, " ")
+    if name then gpu.set(x, y, name) end
     gpu.setBackground(0x888888)
-    gpu.fill(self.x + 2, self.y + 1, self.w - 4, self.h - 2, " ")
-    app.x = self.x + 2
-    app.y = self.y + 1
+    gpu.fill(x + 2, y + 1, self.w - 4, self.h - 2, " ")
+    app.x = x + 2
+    app.y = y + 1
     app:refresh(gpu)
   end
   

@@ -65,7 +65,9 @@ local function mkfolderview(f)
       end
     }
   end
-  app.h = #files + 4
+  if not app.h then
+    app.h = #files + 4
+  end
   return buttons
 end
 
@@ -73,7 +75,6 @@ function app:init()
   self.x = 10
   self.y = 5
   self.w = 64
-  self.h = 32
   self.labels = labelgroup()
   self.labels:add {
     x = 3, y = 2, fg = 0x000000, text = "Path:"

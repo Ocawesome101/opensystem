@@ -2,6 +2,7 @@
 
 -- step 1: animate this $#@%
 
+gpu.setBackground(0x000040)
 for i=1, 10, 1 do
   gpu.fill(1, i*5-4, 160, 5, " ")
   computer.pullSignal(0.0001)
@@ -56,24 +57,28 @@ function app:click(x, y)
 end
 
 function app:refresh()
+  local x, y = self.x, self.y
+  if ui.buffered then
+    x, y = 1, 1
+  end
   gpu.setBackground(0x444444)
   gpu.setForeground(0x888888)
-  gpu.fill(self.x, self.y, self.w, self.h, " ")
-  gpu.set(self.x + 1, self.y, "Login Window")
+  gpu.fill(x, y, self.w, self.h, " ")
+  gpu.set(x + 1, y, "Login Window")
   gpu.setBackground(0x888888)
   gpu.setForeground(0x000000)
-  gpu.fill(self.x+2, self.y+1, self.w-4, self.h-2, " ")
-  gpu.set(self.x + 12, self.y + 2, "Username")
-  gpu.set(self.x + 12, self.y + 5, "Password")
+  gpu.fill(x+2, y+1, self.w-4, self.h-2, " ")
+  gpu.set(x + 12, y + 2, "Username")
+  gpu.set(x + 12, y + 5, "Password")
   gpu.setForeground(0x888888)
   gpu.setBackground(0x000000)
-  gpu.fill(self.x + 4, self.y + 3, self.w - 8, 1, " ")  
-  gpu.fill(self.x + 4, self.y + 6, self.w - 8, 1, " ")
-  gpu.set(self.x + 4, self.y + 3, (self.un:sub(0 - self.w + 9))..(
+  gpu.fill(x + 4, y + 3, self.w - 8, 1, " ")  
+  gpu.fill(x + 4, y + 6, self.w - 8, 1, " ")
+  gpu.set(x + 4, y + 3, (self.un:sub(0 - self.w + 9))..(
     self.focused == 1 and "_" or " "))
-  gpu.set(self.x + 4, self.y + 6, ("*"):rep(#(self.pw:sub(0 - self.w + 9)))..(
+  gpu.set(x + 4, y + 6, ("*"):rep(#(self.pw:sub(0 - self.w + 9)))..(
     self.focused == 2 and "_" or " "))
-  gpu.set(self.x + 13, self.y + 8, "Log In")
+  gpu.set(x + 13, y + 8, "Log In")
 end
 
 function app:close()

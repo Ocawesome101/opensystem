@@ -22,14 +22,15 @@ local function mkview(t)
       skipped = skipped + 1
     end
   end
-  app.h = #apps + 4 - skipped
+  if not app.h then
+    app.h = #apps + 4 - skipped
+  end
 end
 
 function app:init()
   self.x = 3
   self.y = 2
   self.w = 16
-  self.h = 10
   self.apps = fs.list("/apps") or {}
   mkview()
   self.textboxes = textboxgroup()
