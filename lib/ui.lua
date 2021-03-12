@@ -81,7 +81,7 @@ function ui.tick()
       gpu.fill(windows[i].x, windows[i].y, windows[i].w, windows[i].h, " ")
       table.remove(windows, i)
       to = 0
-    elseif s[1] then
+    else--if s[1] then
       if ui.buffered then
         gpu.setActiveBuffer(windows[i].buf)
       end
@@ -93,7 +93,7 @@ function ui.tick()
         gpu.bitblt(0, windows[i].x, windows[i].y)
         gpu.setActiveBuffer(0)
       end
-    elseif windows[i].drag then
+    --[[elseif windows[i].active then
       for n=1, i, 1 do
         if overlaps(windows[n], windows[i]) then
           if ui.buffered then
@@ -113,7 +113,7 @@ function ui.tick()
       if ui.buffered then
         gpu.bitblt(0, windows[i].x, windows[i].y)
         gpu.setActiveBuffer(0)
-      end
+      end]]
     end
   end
 end

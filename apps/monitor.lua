@@ -30,15 +30,25 @@ end
 
 local last = computer.uptime()
 local free = computer.freeMemory() // 1024
+local vfree = 0
+local gtm = 0
 function app:refresh()
   gpu.setForeground(0x000000)
-  gpu.set(self.x + 2, self.y + 1, string.format("Total: %sk", computer.totalMemory() // 1024))
+  gpu.set(self.x + 2, self.y + 1, string.format("Total RAM: %sk", computer.totalMemory() // 1024))
   if computer.uptime() - last >= 1 then
     free = computer.freeMemory() // 1024
     last = computer.uptime()
+    if gpu.freeMemory then
+      gtm = gpu.totalMemory() // 1024
+      vfree = gpu.freeMemory() // 1024
+    end
   end
-  gpu.set(self.x + 2, self.y + 2, string.format("Free: %sk", free))
+  gpu.set(self.x + 2, self.y + 2, string.format("Free RAM: %sk", free))
   gpu.set(self.x + 2, self.y + 5, "Run File")
+  if gpu.freeMemory then
+    gpu.set(self.x + 2, self.y + 7, string.format("Total VRAM: %sk", gtm))
+    gpu.set(self.x + 2, self.y + 8, string.format("Free VRAM: %sk", vfree))
+  end
   self.buttons:draw(self)
   self.textbox:draw(self)
 end
