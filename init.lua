@@ -123,6 +123,7 @@ dofile("/lib/buttons.lua", true)
 dofile("/lib/textbox.lua", true)
 dofile("/lib/label.lua", true)
 dofile("/lib/window.lua", true)
+dofile("/lib/notify.lua", true)
 --dofile("/apps/login.lua", true)
 
 gpu.setBackground(0x000040)
@@ -131,6 +132,6 @@ for i=1, 10, 1 do
   computer.pullSignal(0.0001)
 end
 
-ui.add(dofile("/apps/launcher.lua", true))
+ui.add(dofile("/apps/launcher.lua"))
 
 while true do ui.tick() end

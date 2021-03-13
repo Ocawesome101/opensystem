@@ -57,6 +57,7 @@ function app:key(k)
 end
 
 function app:close()
+  notify("You may not close the Launcher.")
   return "__no_keep_me_open"
 end
 
