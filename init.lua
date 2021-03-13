@@ -123,6 +123,14 @@ dofile("/lib/buttons.lua", true)
 dofile("/lib/textbox.lua", true)
 dofile("/lib/label.lua", true)
 dofile("/lib/window.lua", true)
-dofile("/apps/login.lua", true)
+--dofile("/apps/login.lua", true)
+
+gpu.setBackground(0x000040)
+for i=1, 10, 1 do
+  gpu.fill(1, i*5-4, 160, 5, " ")
+  computer.pullSignal(0.0001)
+end
+
+ui.add(dofile("/apps/launcher.lua", true))
 
 while true do ui.tick() end
