@@ -7,6 +7,7 @@ local windows = {}
 
 function ui.add(app)
   app:init()
+  app.update = true
   if ui.buffered then
     local err
     app.buf, err = gpu.allocateBuffer(app.w, app.h)
@@ -37,6 +38,7 @@ local function overlaps(w1, w2)
 end
 
 local dx, dy, to = 0, 0, 1
+ui.composited = 0
 function ui.tick()
   local s = table.pack(computer.pullSignal(to))
   to = 1
@@ -62,15 +64,18 @@ function ui.tick()
       end
       windows[1].closeme = true
     elseif windows[1].drag ~= 1 then
+      windows[1].update = true
       windows[1]:click(s[3]-windows[1].x+1, s[4]-windows[1].y+1)
     end
     if windows[1] then windows[1].drag = false end
   elseif s[1] == "key_up" then
+    windows[1].update = true
     windows[1]:key(s[3], s[4])
   end
   --gpu.set(1, 1, string.format("%s %s %d %d", s[1], s[2], math.floor(s[3] or 0),
   --  math.floor( s[4] or 0)))
   ::draw::
+  local comp = 0
   for i=#windows, 1, -1 do
     if windows[i].closeme then
       if ui.buffered then
@@ -86,8 +91,11 @@ function ui.tick()
         gpu.setActiveBuffer(windows[i].buf)
       end
       -- note: while buffered, no windows will refresh during a window drag
-      if not (windows[1].drag and ui.buffered) then
+      if (not (windows[1].drag and ui.buffered)) and
+          (windows[i].active or windows[i].update or not ui.buffered) then
+        windows[i].update = false
         windows[i]:refresh(gpu)
+        comp = comp + 1
       end
       if ui.buffered then
         gpu.bitblt(0, windows[i].x, windows[i].y)
@@ -116,6 +124,7 @@ function ui.tick()
       end]]
     end
   end
+  ui.composited = comp
 end
 
 if gpu.allocateBuffer then

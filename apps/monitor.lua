@@ -6,7 +6,7 @@ function app:init()
   self.x = 1
   self.y = 1
   self.w = 20
-  self.h = 10
+  self.h = 11
   self.active = true
   self.buttons = buttongroup()
   self.textbox = textboxgroup()
@@ -48,6 +48,8 @@ function app:refresh()
   if gpu.freeMemory then
     gpu.set(self.x + 2, self.y + 7, string.format("Total VRAM: %sk", gtm))
     gpu.set(self.x + 2, self.y + 8, string.format("Free VRAM: %sk", vfree))
+    gpu.set(self.x + 2, self.y + 9, string.format("Recomposited: %s",
+      ui.composited))
   end
   self.buttons:draw(self)
   self.textbox:draw(self)
@@ -65,4 +67,4 @@ end
 function app:close()
 end
 
-return window(app, "Monitor")
+return window(app, "Statistics")
