@@ -5,26 +5,17 @@ local app = {}
 function app:init()
   self.x = 1
   self.y = 1
-  self.w = 20
-  self.h = 11
+  self.w = 21
+  self.h = 9
   self.active = true
   self.buttons = buttongroup()
-  self.textbox = textboxgroup()
   self.buttons:add({
-    x = 3, y = 4, text = "Shut Down",
+    x = 3, y = 7, text = "Shut Down",
     click = function()computer.shutdown()end
   })
   self.buttons:add({
-    x = 3, y = 5, text = "Restart",
+    x = 3, y = 8, text = "Restart",
     click = function()computer.shutdown(true)end
-  })
-  self.textbox:add({
-    x = 3, y = 7, w = 16, fg = 0x888888,
-    bg = 0x000000, submit = function(text)
-      local app = dofile(text)
-      ui.add(app)
-      return true
-    end
   })
 end
 
@@ -44,15 +35,11 @@ function app:refresh()
     end
   end
   gpu.set(self.x + 2, self.y + 2, string.format("Free RAM: %sk", free))
-  gpu.set(self.x + 2, self.y + 5, "Run File")
-  if gpu.freeMemory then
-    gpu.set(self.x + 2, self.y + 7, string.format("Total VRAM: %sk", gtm))
-    gpu.set(self.x + 2, self.y + 8, string.format("Free VRAM: %sk", vfree))
-    gpu.set(self.x + 2, self.y + 9, string.format("Recomposited: %s",
-      ui.composited))
-  end
+  gpu.set(self.x + 2, self.y + 3, string.format("Total VRAM: %sk", gtm))
+  gpu.set(self.x + 2, self.y + 4, string.format("Free VRAM: %sk", vfree))
+  gpu.set(self.x + 2, self.y + 5, string.format("Recomposited: %s",
+    ui.composited))
   self.buttons:draw(self)
-  self.textbox:draw(self)
 end
 
 function app:click(x, y)
