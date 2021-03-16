@@ -1,4 +1,4 @@
--- notify
+-- notifications, prompts, errors, oh my!
 
 local app = {}
 
@@ -8,6 +8,7 @@ function app:init()
   self.y = (h // 2 - 2)
   self.w = #self.text + 4
   self.h = 4
+  self.age = computer.uptime()
 end
 
 function app:refresh()
@@ -19,6 +20,9 @@ function app:refresh()
     gpu.setForeground(0x000000)
     gpu.set(x + 2, y + 1, self.text)
     self.refreshed = true
+  end
+  if computer.uptime() - self.age >= 10 then -- stick around for !>10s
+    self.closeme = true
   end
 end
 
@@ -38,5 +42,75 @@ end
 
 -- override syserror
 
-function _G.syserror()
+function _G.syserror(err)
+  ui.add(setmetatable({text="(X) " .. err}, {__index = app}))
+end
+
+-- add global prompt function
+
+local papp = {}
+
+function papp:init()
+  local w, h = gpu.getResolution()
+  self.x = (w // 2) - (#self.text // 2) - 2
+  self.y = (h // 2) - 3
+  self.w = #self.text + 4
+  self.h = 5
+  self.labels = labelgroup()
+  self.labels:add {
+    x = 3, y = 2, text = self.text
+  }
+  if self.mode == "text" then
+    self.textbox = textboxgroup()
+    self.textbox:add {
+      x = 3,
+      y = 3,
+      bg = 0x000000,
+      fg = 0x888888,
+      submit = function(text)
+        self.returned = text
+        self.closeme = true
+      end
+    }
+  elseif self.mode == "button" then
+    self.buttons = self.btn
+  end
+end
+
+function papp:refresh()
+  self.labels:draw(self)
+  if self.textbox then self.textbox:draw(self) end
+  if self.buttons then self.buttons:draw(self) end
+end
+
+function papp:click(x,y)
+  if self.textbox then self.textbox:click(x,y) end
+  if self.buttons then self.buttons:click(x,y) end
+end
+
+function papp:key(k)
+  if self.textbox then self.textbox:key(k) end
+end
+
+function papp:close()
+  return "__no_keep_me_open"
+end
+
+function _G.prompt(mode, text, btn)
+  local new = window(
+    setmetatable({text=text,mode=mode,buttons=btn}, {__index = papp}),
+    "Prompt"
+  )
+  ui.add(new)
+  return {
+    poll = function()
+      if new.returned then
+        return new.returned
+      elseif new.closeme then
+        return nil
+      else
+        return true
+      end
+    end
+  }
 end

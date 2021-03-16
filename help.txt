@@ -46,6 +46,16 @@ globals:
     specify width and an optional `.submit(text)' function.  If `.submit()'
     returns `true', the textbox will be cleared.
 \n
+  - `notify(message)': Pops up a small notification box with the specified
+     message.
+\n
+  - `prompt(mode, text[, buttongroup]):[result]': If `mode' is `"text"',
+    prompts the user for a string.  If `mode' is `"button"' then adds
+    `buttongroup' as a child element.  Creates a new window accordingly.
+    Returns an object with one method, `.poll()', which will return `true' if
+    the window is still open, `nil' if it has closed with no return value
+    (i.e. `button' mode), and the returned value if there is one.
+\n
   - `fread(file):string': Reads the specified absolute filepath.  Returns
     `nil' and an error message on failure.
 \n
