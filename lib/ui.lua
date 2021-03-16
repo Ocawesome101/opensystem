@@ -75,7 +75,7 @@ function ui.tick()
     windows[1]:key(s[3], s[4])
   elseif s[1] == "scroll" and not windows[1].drag then
     local i = search(s[3], s[4])
-    if windows[i].scroll then
+    if i and windows[i].scroll then
       windows[i]:scroll(s[5])
       windows[i].update = true
     end
