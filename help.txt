@@ -1,0 +1,61 @@
+Welcome to the Open System!
+\n
+I. Overview.
+\n
+Applications may be launched through the Launcher.  The Browser will assist in
+browsing the system file tree.  The Monitor shows an overview of the system's
+resource usage, as well as one or two other miscellaneous details.  The
+Monitor also provides the ability to shut-down and restart the system.  The
+Editor is a basic text editor.
+\n
+Windows may be closed by right-clicking them.  You may drag any part of a
+window to drag the whole window.  Click on a text-box to select it.  Click
+outside of a textbox, but still in its parent window, to deselect it.
+\n
+\n
+II. Application Structure.
+\n
+The Open System provides a basic application framework.  The System Interface
+expects applications to return a table containing the methods `init',
+`refresh', `click(x,y)', `key(char,scancode)', optionally `scroll(n)' and
+`close()'.  If `close()' returns the string "__no_keep_me_open", then the
+window will not be closed.  Applications must also contain the fields `w',
+`h', `x', and `y'.  These are usually defined in `app:init()'.
+\n
+In favor of ease of application development, the Open System provides a small
+selection of utility functions.  The following functions are provided as
+globals:
+  - `window(app[,title]):win<app>': Wraps the application in a window.  This
+    is the recommended way to create a window.  (e.g. `return window(app,
+    "Name")' at the end of an application file.)
+\n
+  - `labelgroup():group': Returns a new group of labels.  The parent app must
+    call `group:draw(app)' in its `app:refresh()' function.  The group has two
+    more methods, `add({text=string,x=number,y=number[,fg=number
+    [,bg=number]]})' to add a new label and `scroll(n)' to scroll the entire
+    group of labels.
+\n
+  - `buttongroup():group': Returns a new group of buttons.  Buttons are
+    specified identically to labels, with the addition of an optional
+    `.click()' function called when they are clicked.
+\n
+  - `textboxgroup():group': Returns a new group of textboxes.  Textboxes are
+    specified identically to labels, with the addition of a `w' field to
+    specify width and an optional `.submit(text)' function.  If `.submit()'
+    returns `true', the textbox will be cleared.
+\n
+  - `fread(file):string': Reads the specified absolute filepath.  Returns
+    `nil' and an error message on failure.
+\n
+  - `ui.buffered:boolean': Whether the system is using GPU buffers.  If this
+    is `true', apps should be rendered as if they are at (1,1).  This is ONLY
+    relevant if not using `window()'.
+\n
+  - `ui.composited:number': The number of windows whose `:refresh()' function
+    was called on the last screen refresh.  Windows will be recomposited if
+    they recieve a signal;  a one-time recomposite may be forced by setting
+    `app.update' to `true', and apps may be marked as active (will always be
+    recomposited on screen refresh) by setting `app.active' to `true'.  The
+    screen is refreshed every second even if no signal is recieved.  Note that
+    none of the special logic regarding window refreshing is applied if the
+    interface does not use GPU buffers.

@@ -35,3 +35,8 @@ function _G.notify(notif)
   computer.beep(400, 0.2)
   ui.add(setmetatable({text = "/!\\ " .. notif}, {__index = app}))
 end
+
+-- override syserror
+
+function _G.syserror()
+end

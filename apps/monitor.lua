@@ -44,11 +44,9 @@ end
 
 function app:click(x, y)
   self.buttons:click(x, y)
-  self.textbox:click(x, y)
 end
 
 function app:key(k)
-  self.textbox:key(k)
 end
 
 function app:close()

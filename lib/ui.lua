@@ -52,10 +52,12 @@ function ui.tick()
       windows[1].drag = true
     end
   elseif s[1] == "drag" and windows[1].drag then
-    gpu.setBackground(0x000040)
-    gpu.fill(windows[1].x, windows[1].y, windows[1].w, windows[1].h, " ")
-    windows[1].x, windows[1].y = s[3]-dx, s[4]-dy
     windows[1].drag = 1
+    if not windows[1].nodrag then
+      gpu.setBackground(0x000040)
+      gpu.fill(windows[1].x, windows[1].y, windows[1].w, windows[1].h, " ")
+      windows[1].x, windows[1].y = s[3]-dx, s[4]-dy
+    end
   elseif s[1] == "drop" and search(s[3],s[4])==1 then
     if s[5] == 1 then
       if windows[1].close then
@@ -71,6 +73,12 @@ function ui.tick()
   elseif s[1] == "key_up" then
     windows[1].update = true
     windows[1]:key(s[3], s[4])
+  elseif s[1] == "scroll" and not windows[1].drag then
+    local i = search(s[3], s[4])
+    if windows[i].scroll then
+      windows[i]:scroll(s[5])
+      windows[i].update = true
+    end
   end
   --gpu.set(1, 1, string.format("%s %s %d %d", s[1], s[2], math.floor(s[3] or 0),
   --  math.floor( s[4] or 0)))
