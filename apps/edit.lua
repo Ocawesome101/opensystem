@@ -1,86 +1,85 @@
--- edit - text editor
+-- new text editor
 
 local app = {}
 
-local lines = {""}
-local scr = 0
-
-local function update()
-  app.textboxes = textboxgroup()
-  for i=scr+1, math.min(app.h,math.max(#lines,1)), 1 do
-    app.textboxes:add {
-      x = 1, y = i-scr, w = app.w, fg = 0x000000,
-      i = i, text = lines[i] or "", submit = function(text)
-        lines[i] = text
-        if i >= #lines then
-          lines[#lines+1]=""
-        else
-          table.insert(lines, i + 1, "")
-        end
-        update()
-        app.textboxes.focused = i + 1
-      end
-    }
-    --app.textboxes.boxes[#app.textboxes.boxes].text = lines[i] or ""
-  end
-end
-
 function app:init()
-  self.x = 20
-  self.y = 10
+  self.x = 10
+  self.y = 5
   self.w = 80
-  self.h = 24
-  update()
-end
-
-function app:load(file)
-  local data = fread(file) or ""
-  local ln = ""
-  lines = {}
-  for c in data:gmatch() do
-    if c == "\n" then
-      lines[#lines + 1] = ln
-      ln = ""
-    else
-      ln = ln .. c
-    end
-  end
+  self.h = 25
+  self.scrollp = 0
+  self.text = ""
+  self.pos = 0
 end
 
 function app:refresh()
-  self.textboxes:draw(self)
-  if self.prompt then
-    local file = self.prompt.poll()
-    if file and type(file) == "string" then
-      self.prompt = nil
-      if fs.exists(file) then
-        self:load(file)
-      else
-        notify("That file does not exist.")
-      end
+  gpu.setForeground(0x000000)
+  gpu.fill(self.x, self.y, self.w, self.h, " ")
+  local text = {}
+  local line = ""
+  local written = 0
+  for c in self.text:gmatch(".") do
+    written = written + 1
+    if c == "\n" then
+      text[#text+1]=line
+      line=""
+    elseif written-1 == self.pos then
+      line=line.."|"
+    else
+      line=line..c
+    end
+    if #line>=self.w then
+      text[#text+1]=line
+      line=""
     end
   end
-end
-
-function app:key(k, c)
-  self.textboxes:key(k)
-  if self.textboxes[self.textboxes.focused] then
-    lines[self.textboxes[self.textboxes.focused].i] =
-      self.textboxes[self.textboxes.focused].text
-  end
-  if k == 15 then -- ^O
-    self.prompt = prompt("text", "File to open:")
+  if written==self.pos then line = line .. "|" end
+  if #line > 0 then text[#text+1]=line end
+  for i=1, self.h, 1 do
+    local n = i + self.scrollp
+    gpu.set(self.x, self.y+i-1, text[n] or "")
   end
 end
 
-function app:click(x,y)
-  self.textboxes:click(x,y)
+function app:key(c,k)
+  local ch = string.char(c)
+  if k == 205 then
+    self.pos = self.pos + 1
+    if self.pos > #self.text then
+      self.text = self.text .. string.rep(" ", self.pos - #self.text)
+    end
+  elseif k == 203 then
+    if self.pos > 0 then self.pos = self.pos - 1 end
+  elseif k == 200 then
+    if self.pos > self.w then self.pos = self.pos - self.w end
+  elseif k == 208 then
+    self.pos = self.pos + self.w
+    if self.pos > #self.text then
+      self.text = self.text .. string.rep(" ", self.pos - #self.text)
+    end
+  elseif c > 31 and c < 127 then
+    if self.pos >= #self.text then
+      self.text = self.text .. ch
+    else
+      self.text = self.text:sub(0, self.pos) .. ch .. self.text:sub(self.pos+1)
+    end
+    self.pos = self.pos + 1
+  elseif c == 8 and self.pos > 0 then
+    self.text = self.text:sub(0, self.pos - 1) .. self.text:sub(self.pos + 1)
+    self.pos = self.pos - 1
+  elseif c == 13 then
+    local prev = #self.text - (self.text
+      :reverse()
+      :find("\n", #self.text - self.pos) or (#self.text - self.pos))
+    self.text = self.text:sub(0,self.pos) .. "\n" .. self.text:sub(self.pos+1)
+  end
 end
+
+function app:click()end
 
 function app:scroll(n)
-  scr = scr + n
-  if scr < 0 then scr = 0 end
-  update()
+  self.scrollp = self.scrollp + n
+  if self.scrollp < 0 then self.scrollp = 0 end
 end
 
 function app:close()

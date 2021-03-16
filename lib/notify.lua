@@ -15,7 +15,7 @@ function app:refresh()
   local x, y = self.x, self.y
   if ui.buffered then x = 1 y = 1 end
   if not (ui.buffered and self.refreshed) then
-    gpu.setBackground(0x888888)
+    gpu.setBackground(self.bg or 0x888888)
     gpu.fill(x, y, self.w, self.h, " ")
     gpu.setForeground(0x000000)
     gpu.set(x + 2, y + 1, self.text)
@@ -43,7 +43,7 @@ end
 -- override syserror
 
 function _G.syserror(err)
-  ui.add(setmetatable({text="(X) " .. err}, {__index = app}))
+  ui.add(setmetatable({text="(X) " .. err, bg = 0x444444}, {__index = app}))
 end
 
 -- add global prompt function

@@ -15,7 +15,11 @@ local function mkview(t)
         x = 3, y = 3 + i - skipped, text = a:gsub("%.lua$", ""), fg = 0,
         click = function()
           local app = dofile("/apps/"..a)
-          ui.add(app)
+          if not app.init then
+            notify("That application has no init function.")
+          else
+            ui.add(app)
+          end
         end
       }
     else

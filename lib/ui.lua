@@ -2,17 +2,34 @@
 
 _G.ui = {}
 component.invoke(gpu.getScreen(), "setPrecise", false)
+local oserr=syserror
 
 local windows = {}
 
+local erroring = false
 function ui.add(app)
+  if not app.init then
+    notify("That application has no init function.")
+    return
+  elseif not app.refresh then
+    notify("That application has no refresh function.")
+    return
+  end
   app:init()
   app.update = true
   if ui.buffered then
     local err
     app.buf, err = gpu.allocateBuffer(app.w, app.h)
     if not app.buf then
-      syserror(err)
+      if erroring then
+        -- we ran into an error with the error box.  Oh no!
+        oserr(err)
+      else
+        -- there's a chance we might have enough VRAM for an error box.
+        erroring = true
+        syserror(err)
+        erroring = false
+      end
     end
   end
   table.insert(windows, 1, app)
@@ -35,6 +52,20 @@ local function overlaps(w1, w2)
     and w1.y <= w2.y + w2.h) or
          (w2.x >= blx and w2.x + w2.h <= blx and w2.y >= bly
     and w2.y + w2.h <= bly)
+end
+
+local function func()end
+local closeme = {closeme=true,
+  init=func,refresh=func,key=func,click=func,close=func}
+
+local function call(n, i, f, ...)
+  local ok, err = pcall(f, ...)
+  if not ok and err then
+    windows[i]=closeme
+    syserror(string.format(
+      "Error in %s handler: %s", n, err))
+  end
+  return err
 end
 
 local dx, dy, to = 0, 0, 1
@@ -61,27 +92,34 @@ function ui.tick()
   elseif s[1] == "drop" and search(s[3],s[4])==1 then
     if s[5] == 1 then
       if windows[1].close then
-        local r = windows[1]:close()
+        local r = call("close", 1, windows[1].close, windows[1])
         if r == "__no_keep_me_open" then goto draw end
       end
       windows[1].closeme = true
     elseif windows[1].drag ~= 1 then
       windows[1].update = true
-      windows[1]:click(s[3]-windows[1].x+1, s[4]-windows[1].y+1)
+      if not windows[1].click then
+        notify("Application has no click handler.")
+      else
+        call("click", 1, windows[1].click, windows[1],
+          s[3]-windows[1].x+1, s[4]-windows[1].y+1)
+      end
     end
     if windows[1] then windows[1].drag = false end
   elseif s[1] == "key_up" then
-    windows[1].update = true
-    windows[1]:key(s[3], s[4])
+    if not windows[1].key then
+      notify("Application has no keypress handler.")
+    else
+      windows[1].update = true
+      call("key", 1, windows[1].key, windows[1], s[3], s[4])
+    end
   elseif s[1] == "scroll" and not windows[1].drag then
     local i = search(s[3], s[4])
     if i and windows[i].scroll then
-      windows[i]:scroll(s[5])
+      call("scroll", i, windows[i].scroll, windows[i], s[5])
       windows[i].update = true
     end
   end
-  --gpu.set(1, 1, string.format("%s %s %d %d", s[1], s[2], math.floor(s[3] or 0),
-  --  math.floor( s[4] or 0)))
   ::draw::
   local comp = 0
   for i=#windows, 1, -1 do
@@ -102,34 +140,13 @@ function ui.tick()
       if (not (windows[1].drag and ui.buffered)) and
           (windows[i].active or windows[i].update or not ui.buffered) then
         windows[i].update = false
-        windows[i]:refresh(gpu)
+        call("refresh", i, windows[i].refresh, windows[i], gpu)
         comp = comp + 1
       end
       if ui.buffered then
         gpu.bitblt(0, windows[i].x, windows[i].y)
         gpu.setActiveBuffer(0)
       end
-    --[[elseif windows[i].active then
-      for n=1, i, 1 do
-        if overlaps(windows[n], windows[i]) then
-          if ui.buffered then
-            gpu.setActiveBuffer(windows[n].buf)
-          end
-          windows[n]:refresh(gpu)
-          if ui.buffered then
-            gpu.bitblt(0, windows[n].x, windows[n].y)
-            gpu.setActiveBuffer(0)
-          end
-        end
-      end
-      if ui.buffered then
-        gpu.setActiveBuffer(windows[i].buf)
-      end
-      windows[i]:refresh(gpu)
-      if ui.buffered then
-        gpu.bitblt(0, windows[i].x, windows[i].y)
-        gpu.setActiveBuffer(0)
-      end]]
     end
   end
   ui.composited = comp
