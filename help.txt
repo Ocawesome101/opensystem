@@ -2,6 +2,8 @@ Welcome to the Open System!
 \n
 I. Overview.
 \n
+The Launcher may not be closed and will block any attempt to do so.
+\n
 Applications may be launched through the Launcher.  The Browser will assist in
 browsing the system file tree.  The Monitor shows an overview of the system's
 resource usage, as well as one or two other miscellaneous details.  The
