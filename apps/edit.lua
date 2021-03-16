@@ -9,14 +9,19 @@ local function update()
   app.textboxes = textboxgroup()
   for i=scr+1, math.min(app.h,math.max(#lines,1)), 1 do
     app.textboxes:add {
-      x = 1, y = i, w = app.w, fg = 0x000000, submit = function()
+      x = 1, y = i-scr, w = app.w, fg = 0x000000,
+      i = i, text = lines[i] or "", submit = function(text)
+        lines[i] = text
         if i >= #lines then
           lines[#lines+1]=""
         else
           table.insert(lines, i + 1, "")
         end
+        update()
+        app.textboxes.focused = i + 1
       end
     }
+    --app.textboxes.boxes[#app.textboxes.boxes].text = lines[i] or ""
   end
 end
 
@@ -44,18 +49,27 @@ end
 
 function app:refresh()
   self.textboxes:draw(self)
+  if self.prompt then
+    local file = self.prompt.poll()
+    if file and type(file) == "string" then
+      self.prompt = nil
+      if fs.exists(file) then
+        self:load(file)
+      else
+        notify("That file does not exist.")
+      end
+    end
+  end
 end
 
 function app:key(k, c)
   self.textboxes:key(k)
+  if self.textboxes[self.textboxes.focused] then
+    lines[self.textboxes[self.textboxes.focused].i] =
+      self.textboxes[self.textboxes.focused].text
+  end
   if k == 15 then -- ^O
-    local file = prompt("text", "Enter File")
-    if not file then return end
-    if not fs.exists(file) then
-      notify("That file does not exist.")
-    else
-      self:load(file)
-    end
+    self.prompt = prompt("text", "File to open:")
   end
 end
 

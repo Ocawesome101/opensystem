@@ -58,13 +58,14 @@ function papp:init()
   self.h = 5
   self.labels = labelgroup()
   self.labels:add {
-    x = 3, y = 2, text = self.text
+    x = 3, y = 2, fg = 0, text = self.text
   }
   if self.mode == "text" then
     self.textbox = textboxgroup()
     self.textbox:add {
       x = 3,
       y = 3,
+      w = #self.text,
       bg = 0x000000,
       fg = 0x888888,
       submit = function(text)
