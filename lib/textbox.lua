@@ -2,7 +2,7 @@
 
 local base = {}
 
-function base:key(k)
+function base:key(k, c)
   if self.focused == 0 then return end
   local box = self.boxes[self.focused]
   if not box then return end

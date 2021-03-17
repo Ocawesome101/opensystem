@@ -116,15 +116,16 @@ function ui.tick()
   elseif s[1] == "scroll" and not windows[1].drag then
     local i = search(s[3], s[4])
     if i and windows[i].scroll then
-      call("scroll", i, windows[i].scroll, windows[i], s[5])
+      call("scroll", i, windows[i].scroll, windows[i], -s[5])
       windows[i].update = true
     end
   end
   ::draw::
+  ui.nWindows = #windows
   local comp = 0
   for i=#windows, 1, -1 do
     if windows[i].closeme then
-      if ui.buffered then
+      if ui.buffered and windows[i].buf then
         gpu.freeBuffer(windows[i].buf)
         gpu.setActiveBuffer(0)
       end
@@ -132,13 +133,13 @@ function ui.tick()
       gpu.fill(windows[i].x, windows[i].y, windows[i].w, windows[i].h, " ")
       table.remove(windows, i)
       to = 0
-    else--if s[1] then
+    else
       if ui.buffered then
         gpu.setActiveBuffer(windows[i].buf or 0)
       end
       -- note: while buffered, no windows will refresh during a window drag
-      if (not (windows[1].drag and ui.buffered)) and
-          (windows[i].active or windows[i].update or not ui.buffered) then
+      if (not windows[i].buf) or ((not (windows[1].drag and ui.buffered)) and
+          (windows[i].active or windows[i].update or not ui.buffered)) then
         windows[i].update = false
         call("refresh", i, windows[i].refresh, windows[i], gpu)
         comp = comp + 1
@@ -148,6 +149,11 @@ function ui.tick()
         gpu.setActiveBuffer(0)
       end
     end
+  end
+  if ui.buf then
+    gpu.setActiveBuffer(ui.buf)
+    gpu.bitblt(0)
+    gpu.setActiveBuffer(0)
   end
   ui.composited = comp
 end
