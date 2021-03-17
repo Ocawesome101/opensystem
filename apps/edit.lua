@@ -8,8 +8,8 @@ function app:init()
   self.w = 80
   self.h = 25
   self.scrollp = 0
-  self.text = ""
-  self.pos = 0
+  self.text = "this is some text"
+  self.pos = #self.text
 end
 
 function app:refresh()
@@ -20,17 +20,13 @@ function app:refresh()
   local written = 0
   for c in self.text:gmatch(".") do
     written = written + 1
-    if c == "\n" then
+    if c == "\n" or #line >= self.w then
       text[#text+1]=line
       line=""
     elseif written-1 == self.pos then
       line=line.."|"
     else
       line=line..c
-    end
-    if #line>=self.w then
-      text[#text+1]=line
-      line=""
     end
   end
   if written==self.pos then line = line .. "|" end
