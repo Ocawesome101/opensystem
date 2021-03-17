@@ -134,7 +134,7 @@ function ui.tick()
       to = 0
     else--if s[1] then
       if ui.buffered then
-        gpu.setActiveBuffer(windows[i].buf)
+        gpu.setActiveBuffer(windows[i].buf or 0)
       end
       -- note: while buffered, no windows will refresh during a window drag
       if (not (windows[1].drag and ui.buffered)) and
