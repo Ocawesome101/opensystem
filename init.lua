@@ -113,7 +113,7 @@ local function dfile(filepath, x)
 end
 
 function dofile(f, x)
-  local ok, err = pcall(dfile, f, x)
+  local ok, err = pcall(dfile, f)
   if not ok then syserror(err) end
   return err
 end

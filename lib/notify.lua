@@ -43,6 +43,7 @@ end
 -- override syserror
 
 function _G.syserror(err)
+  computer.beep(200, 0.5)
   ui.add(setmetatable({text="(X) " .. err, bg = 0x444444}, {__index = app}))
 end
 
