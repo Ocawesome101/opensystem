@@ -46,7 +46,8 @@ end
 local function search(x, y)
   for i=1, #windows, 1 do
     local w = windows[i]
-    if x >= w.x and x <= w.x + w.w and y >= w.y and y <= w.y + w.h then
+    if (w.x and w.y and w.w and w.h) and
+      x >= w.x and x <= w.x + w.w and y >= w.y and y <= w.y + w.h then
       return i, windows[i]
     end
   end
@@ -70,6 +71,7 @@ local function call(n, i, f, ...)
   local ok, err = pcall(f, ...)
   if not ok and err then
     closeme.n = windows[i].n
+    closeme.buf = windows[i].buf
     windows[i]=closeme
     syserror(string.format(
       "Error in %s handler: %s", n, err))
