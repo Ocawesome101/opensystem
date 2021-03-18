@@ -35,7 +35,6 @@ function app:init()
   self.x = 3
   self.y = 2
   self.w = 16
-  self.apps = fs.list("/apps") or {}
   mkview()
   self.textboxes = textboxgroup()
   self.textboxes:add {

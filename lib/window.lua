@@ -21,6 +21,7 @@ local function wrap(app, name)
     gpu.fill(x, y, self.w, self.h, " ")
     if name then gpu.set(x, y, name) end
     gpu.setBackground(0x888888)
+    gpu.setForeground(0x000000)
     gpu.fill(x + 2, y + 1, self.w - 4, self.h - 2, " ")
     app.x = x + 2
     app.y = y + 1
