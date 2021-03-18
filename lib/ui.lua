@@ -6,6 +6,7 @@ local oserr=syserror
 
 local windows = {}
 
+local running = {}
 local erroring = false
 function ui.add(app)
   if not app.init then
@@ -32,7 +33,14 @@ function ui.add(app)
       end
     end
   end
+  app.n = math.random(0, 999999999)
+  running[app.n] = true
   table.insert(windows, 1, app)
+  return app.n
+end
+
+function ui.running(n)
+  return not not running[n]
 end
 
 local function search(x, y)
@@ -61,6 +69,7 @@ local closeme = {closeme=true,
 local function call(n, i, f, ...)
   local ok, err = pcall(f, ...)
   if not ok and err then
+    closeme.n = windows[i].n
     windows[i]=closeme
     syserror(string.format(
       "Error in %s handler: %s", n, err))
@@ -130,7 +139,12 @@ function ui.tick()
         gpu.setActiveBuffer(0)
       end
       gpu.setBackground(0x000040)
-      gpu.fill(windows[i].x, windows[i].y, windows[i].w, windows[i].h, " ")
+      if windows[i].x and windows[i].y and windows[i].w and windows[i].h then
+        gpu.fill(windows[i].x, windows[i].y, windows[i].w, windows[i].h, " ")
+      end
+      if windows[i].n then
+        running[windows[i].n] = nil
+      end
       table.remove(windows, i)
       to = 0
     else

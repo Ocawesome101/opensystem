@@ -133,6 +133,11 @@ for i=1, 10, 1 do
   computer.pullSignal(0.0001)
 end
 
-ui.add(dofile("/apps/launcher.lua"))
+local n = ui.add(dofile("/apps/launcher.lua"))
 
-while true do ui.tick() end
+while true do
+  ui.tick()
+  if not ui.running(n) then
+    n = ui.add(dofile("/apps/launcher.lua"))
+  end
+end

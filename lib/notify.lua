@@ -42,9 +42,14 @@ end
 
 -- override syserror
 
+local oserr = syserror
+local erroring = false
 function _G.syserror(err)
+  if erroring then oserr(err) end
+  erroring = true
   computer.beep(200, 0.5)
   ui.add(setmetatable({text="(X) " .. err, bg = 0x444444}, {__index = app}))
+  erroring = false
 end
 
 -- add global prompt function
