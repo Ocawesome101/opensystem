@@ -43,7 +43,7 @@ end
   selfdecl = [[
   self.%s = %s
 ]],
-  -- elemadd<x, y, w, fg, bg, text>
+  -- elemadd<x, y, w, fg, bg, text, click, submit>
   elemadd = [[
   self.%s:add {
     x = %d,
@@ -51,7 +51,9 @@ end
     w = %s,
     fg = %s,
     bg = %s,
-    text = %q
+    text = %q,
+    click = %s,
+    submit = %s
   }
 ]],
 }
