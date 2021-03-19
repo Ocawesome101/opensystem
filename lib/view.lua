@@ -3,12 +3,12 @@
 local _view = {}
 
 function _view:click(x,y)
-  self.textboxes:click(x-self.x,y-self.y)
-  self.buttons:click(x-self.x,y-self.y)
+  if self.textboxes then self.textboxes:click(x-self.x,y-self.y) end
+  if self.buttons then self.buttons:click(x-self.x,y-self.y) end
 end
 
 function _view:key(c,k)
-  self.textboxes:key(c,k)
+  if self.textboxes then self.textboxes:key(c,k) end
 end
 
 function _view:draw(app)
