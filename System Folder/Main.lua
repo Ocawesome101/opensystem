@@ -76,4 +76,84 @@ do
   end
 end
 
+-- Menu functions
+-- this is used to create a drop-down menu
+-- as a special case, "[spacer]" will insert a spacer that is not clickable.
+-- note that these menus as they stand will lock up the entire system while
+-- in use.  this is roughly how the Classic Mac OS functioned as well, so I'm
+-- not particularly worried about it as long as the menu closes when the mouse
+-- is released.
+do
+  local function dmenu(x, y, it, mw, mh, p)
+    gpu.setForeground(0)
+    gpu.setBackground(0xFFFFFF)
+    local is_spacer = (it[p] == "[spacer]")
+    --if is_spacer then error("is spacer") end
+    for i=1, math.min(#it, mh), 1 do
+      local draw = it[i]
+      if it[i] == "[spacer]" then
+        draw = string.rep("┈", mw)
+      end
+      if p == i and not is_spacer then
+        gpu.setForeground(0xFFFFFF)
+        gpu.setBackground(0)
+      elseif i == p + 1 then
+        gpu.setForeground(0)
+        gpu.setBackground(0xFFFFFF)
+      end
+      gpu.set(x, y + i - 1, string.format("⡇%s⢸",
+        draw .. string.rep(" ", mw - #draw)))
+    end
+    gpu.setForeground(0)
+    gpu.setBackground(0xFFFFFF)
+    gpu.set(x, y + math.min(#it, mh), string.format("⣇%s⣸",
+      string.rep("⣀", mw)))
+  end
+  
+  function system.menu(x, y, items, maxWidth, maxHeight)
+    checkArg(1, x, "number")
+    checkArg(2, y, "number")
+    checkArg(3, items, "table")
+    checkArg(4, maxWidth, "number", "nil")
+    checkArg(5, maxHeight, "number", "nil")
+    local maxWidth, maxHeight
+    if not maxWidth then
+      maxWidth = 0
+      for i=1, #items, 1 do
+        if #items[i] > maxWidth then
+          maxWidth = #items[i]
+        end
+      end
+    end
+    maxHeight = maxHeight or #items
+    local press = 0
+    dmenu(x, y, items, maxWidth, maxHeight, 0)
+    while true do
+      local evt, _, mx, my = computer.pullSignal()
+      if evt == "drag" or evt == "drop" then
+        if x >= x - 1 and x <= x + maxWidth + 1 then
+          press = math.max(y, math.min(y + maxHeight, my)) - y + 1
+        end
+      end
+      if evt == "drop" then
+        dmenu(x, y, items, maxWidth, maxHeight, press)
+        computer.pullSignal(0.1)
+        dmenu(x, y, items, maxWidth, maxHeight, 0)
+        computer.pullSignal(0.1)
+        dmenu(x, y, items, maxWidth, maxHeight, press)
+        computer.pullSignal(0.1)
+        dmenu(x, y, items, maxWidth, maxHeight, 0)
+        computer.pullSignal(0.1)
+        return items[press] ~= "[spacer]" and items[press] or nil
+      end
+      dmenu(x, y, items, maxWidth, maxHeight, press)
+    end
+  end
+end
+
+-- Window system functions
+--  
+do
+end
+
 while true do computer.pullSignal() end

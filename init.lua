@@ -2,30 +2,31 @@
 ROM_VERSION = 1.1
 
 -- GPU + some graphical functions
-local gpu=component.proxy(component.list"gpu"())
+local gpu,w,h=component.proxy(component.list"gpu"())
 gpu.bind((assert(component.list"screen"())))
+w,h=gpu.maxResolution()
+if w>=80 then
+  w,h=80,25
+  gpu.setResolution(80, 25)
+end
 
 _G.system={}
 
-local icons={
-  system={
-    "⡏⡏⠯⠭⠏⠯⠽⢹",
-    "⡇⡯⢽⠉⡏⠭⠭⢽",
-    "⡇⡯⢽ ⡇⠭⠭⢽",
-    "⣇⣯⣽⣀⣇⣭⣭⣽"
-  },
-  alert={
-    "  ⢀⠎⠱⡀  ",
-    " ⢀⠎⡎⢱⠱⡀ ",
-    "⢀⠎ ⡣⢜ ⠱⡀",
-    "⣎⣀⣀⣑⣊⣀⣀⣱"
-  },
-  info={
-    "⢀⠔⠊⢉⡉⠑⠢⡀",
-    "⡎  ⡣⢜  ⢱",
-    "⢇  ⡇⢸  ⡸",
-    "⠈⠢⢄⣈⣁⡠⠔⠁"
-  },
+local icons={system={
+"⡏⡏⠯⠭⠏⠯⠽⢹",
+"⡇⡯⢽⠉⡏⠭⠭⢽",
+"⡇⡯⢽ ⡇⠭⠭⢽",
+"⣇⣯⣽⣀⣇⣭⣭⣽"},
+alert={
+"  ⢀⠎⠱⡀  ",
+" ⢀⠎⡎⢱⠱⡀ ",
+"⢀⠎ ⡣⢜ ⠱⡀",
+"⣎⣀⣀⣑⣊⣀⣀⣱"},
+info={
+"⢀⠔⠊⢉⡉⠑⠢⡀",
+"⡎  ⡣⢜  ⢱",
+"⢇  ⡇⢸  ⡸",
+"⠈⠢⢄⣈⣁⡠⠔⠁"},
 --[[
 info={
 "⢀⠔⠊⡩⢍⠑⠢⡀",
@@ -39,7 +40,7 @@ function system.icon(ic,x,y)
   checkArg(1,ic,"string","table")
   checkArg(2,x,"number")
   checkArg(3,y,"number")
-  if type(ic)=="string"then ic=icons[ic]end
+  if icons[ic]then ic=icons[ic]end
   for i=1,#ic,1 do
     gpu.set(x,y+i-1,ic[i])
   end
@@ -48,7 +49,6 @@ end
 function system.drawbg()
   gpu.setForeground(0)
   gpu.setBackground(0xFFFFFF)
-  local w,h=gpu.getResolution()
   gpu.fill(1,1,w,h,"▒")
   gpu.fill(1,1,w,1," ")
 end
@@ -93,11 +93,10 @@ function system.notify(icon,text,opts)
   checkArg(1,icon,"string")
   checkArg(2,text,"string")
   checkArg(3,opts,"table")
-  local w,h=gpu.maxResolution()
-  local bw=math.max(48,#text+16)
+  local bw,bh=math.max(48,#text+16),8
   local bx,by=(w//2)-(bw//2),(h//4)
   gpu.setForeground(0)
-  system.frame(bx,by,bw,12)
+  system.frame(bx,by,bw,bh)
   system.icon(icon,bx+3,by+2)
   gpu.set(bx+14,by+3,text)
   if #opts==0 then return end
@@ -107,7 +106,7 @@ function system.notify(icon,text,opts)
     local n=0
     for i,opt in ipairs(opts)do
       local len=#opt+3
-      local Bx,By=(bx+bw-1-n)-len,by+9
+      local Bx,By=(bx+bw-1-n)-len,by+bh-3
       local pr=(evt=="touch"and(x>=Bx and x<=Bx+len)and(y>=By and y<=By+2))
       system.button(opt,Bx,By,pr)
       if pr then return opt end
