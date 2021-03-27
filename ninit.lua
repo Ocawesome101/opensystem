@@ -1,3 +1,0 @@
--- new init.lua
-
-local gpu, fs = ...
