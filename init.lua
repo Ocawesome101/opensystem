@@ -99,7 +99,7 @@ function system.notify(icon,text,opts)
   gpu.setForeground(0)
   system.frame(bx,by,bw,12)
   system.icon(icon,bx+3,by+2)
-  gpu.set(bx+12,by+3,text)
+  gpu.set(bx+14,by+3,text)
   if #opts==0 then return end
   computer.pushSignal("box")
   while true do
@@ -171,7 +171,7 @@ do
   until computer.uptime()>=mt
 end
 
-system.loadfile("/System Folder/Main.lua")()
+system.loadfile("/System Folder/Main.lua")(gpu)
 
 system.notify("info","It is now safe to turn off your computer.",{"Restart"})
 computer.shutdown(true)
