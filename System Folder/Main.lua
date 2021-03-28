@@ -51,6 +51,7 @@ do
       error("software canvas fill unsupported")
     end
   end
+  system._canvas = _canvas
 
   function system.canvas(w, h)
     if gpu.allocateBuffer then
@@ -101,8 +102,9 @@ do
         gpu.setForeground(0)
         gpu.setBackground(0xFFFFFF)
       end
-      gpu.set(x, y + i - 1, string.format("⡇%s⢸",
-        draw .. string.rep(" ", mw - #draw)))
+      local text = string.format("%s%s", draw, string.rep(" ", mw - #draw))
+      gpu.set(x, y + i - 1, string.format("%s%s%s",
+        p == i and " " or "⡇", text, p == i and " " or "⢸"))
     end
     gpu.setForeground(0)
     gpu.setBackground(0xFFFFFF)
@@ -151,9 +153,23 @@ do
   end
 end
 
--- Window system functions
---  
+-- Load the rest of the system
 do
+  local function dofile(f)
+    local ok, err = system.loadfile(f)
+    if not ok then
+      system.notify("alert", err, {})
+      while true do computer.pullSignal() end
+    end
+    local ok = xpcall(ok, function(...)system.notify("alert",...,{})end)
+    if not ok then
+      while true do computer.pullSignal() end
+    end
+    return true
+  end
+  
+  dofile("/System Folder/Libraries/Interface.lua")
+  dofile("/System Folder/Finder.lua")
 end
 
 while true do computer.pullSignal() end

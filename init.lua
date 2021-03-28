@@ -27,13 +27,7 @@ info={
 "⡎  ⡣⢜  ⢱",
 "⢇  ⡇⢸  ⡸",
 "⠈⠢⢄⣈⣁⡠⠔⠁"},
---[[
-info={
-"⢀⠔⠊⡩⢍⠑⠢⡀",
-"⡎  ⡕⢪  ⢱",
-"⢇  ⡇⢸  ⡸",
-"⠈⠢⢄⣑⣊⡠⠔⠁"}
---]]
+--info={"⢀⠔⠊⡩⢍⠑⠢⡀","⡎  ⡕⢪  ⢱","⢇  ⡇⢸  ⡸","⠈⠢⢄⣑⣊⡠⠔⠁"}
 }
 
 function system.icon(ic,x,y)
@@ -147,7 +141,9 @@ function system.readfile(f)
 end
 
 function system.loadfile(f,m,e)
-  return load(system.readfile(f),"="..f,m,e)
+  local d,E=system.readfile(f)
+  if not d then return nil,E end
+  return load(d,"="..f,m,e)
 end
 
 function system.writefile(f,d)
