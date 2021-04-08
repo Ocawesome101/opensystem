@@ -155,21 +155,21 @@ end
 
 -- Load the rest of the system
 do
-  local function dofile(f)
+  local function dofile(f, ...)
     local ok, err = system.loadfile(f)
     if not ok then
       system.notify("alert", err, {})
       while true do computer.pullSignal() end
     end
-    local ok = xpcall(ok, function(...)system.notify("alert",...,{})end)
+    local ok = xpcall(ok, function(...)system.notify("alert",...,{})end, ...)
     if not ok then
       while true do computer.pullSignal() end
     end
     return true
   end
   
-  dofile("/System Folder/Libraries/Interface.lua")
-  dofile("/System Folder/Finder.lua")
+  dofile("/System Folder/Libraries/Interface.lua", gpu)
+  dofile("/System Folder/Finder.lua", gpu)
 end
 
 while true do computer.pullSignal() end
