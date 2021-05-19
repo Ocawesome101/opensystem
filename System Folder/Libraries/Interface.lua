@@ -48,13 +48,13 @@ function finder.makeWindow(title, canvas)
   local function refresh(focused)
     _window.refresh(canvas, tb, focused)
   end
-  setmetatable(win, __index = function(t, k)
+  setmetatable(win, { __index = function(t, k)
     if k == "refresh" then
       return refresh
     else
       return canvas[k] or _window[k]
     end
-  end)
+  end })
 end
 
 function finder.start()
