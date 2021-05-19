@@ -4,6 +4,8 @@ local fs = component.proxy(computer.getBootAddress())
 local gpu = component.proxy((component.list("gpu", true)()))
 gpu.bind((component.list("screen", true)()))
 
+gpu.setDepth(gpu.maxDepth())
+
 _G.fs = fs
 _G.gpu = gpu
 

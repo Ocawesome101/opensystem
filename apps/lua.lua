@@ -50,6 +50,7 @@ function app:init()
         else
           for i=2, result.n, 1 do result[i] = tostring(result[i]) end
           local new = string.format(("%s  "):rep(result.n-1), table.unpack(result, 2))
+          new = text .. " = " .. new
           while #new > WIDTH do
             self.text[#self.text+1] = new:sub(1, WIDTH)
             new = new:sub(WIDTH + 1)
